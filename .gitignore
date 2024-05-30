@@ -36,3 +36,6 @@ debug/
 
 # Python
 __pycache__/
+
+cmake-build-*/
+.direnv/

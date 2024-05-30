@@ -1,7 +1,6 @@
 {
   "_comment0": "Basic parameters",
-  "ASSETS_DIR": "../assets/",
-  
+  "ASSETS_DIR": "./assets/",
   "#": "Display parameters",
   "DISPLAY": 1,
   "WORLD_SZ": 100,
@@ -9,7 +8,6 @@
   "DRAW_INTERROBOT": 0,
   "DRAW_PATH": 0,
   "DRAW_WAYPOINTS": 0,
-  
   "##": "Simulation parameters",
   "SEED": 2,
   "TIMESTEP": 0.1,
@@ -21,12 +19,10 @@
   "MAX_SPEED": 2,
   "COMMS_FAILURE_RATE": 0,
   "FORMATION": "junction_twoway",
-  "OBSTACLE_FILE": "../assets/imgs/junction_twoway.png",
-
+  "OBSTACLE_FILE": "./assets/imgs/junction_twoway.png",
   "###": "GBP parameters",
   "SIGMA_FACTOR_DYNAMICS": 0.1,
   "SIGMA_FACTOR_INTERROBOT": 0.01,
   "SIGMA_FACTOR_OBSTACLE": 0.01,
   "NUM_ITERS": 10
-
 }

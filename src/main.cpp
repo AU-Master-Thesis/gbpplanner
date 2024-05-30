@@ -2,11 +2,13 @@
 // Copyright (c) 2023 Aalok Patwardhan (a.patwardhan21@imperial.ac.uk)
 // This code is licensed (see LICENSE for details)
 
-// Define all parameters in the appropriate config file (default: config/config.json)
+// Define all parameters in the appropriate config file (default:
+// config/config.json)
 /**************************************************************************************/
-#define RLIGHTS_IMPLEMENTATION // needed to be defined once for the lights shader
-#include <iostream>
+#define RLIGHTS_IMPLEMENTATION // needed to be defined once for the lights
+                               // shader
 #include <Utils.h>
+#include <iostream>
 
 #include <DArgs.h>
 
@@ -14,24 +16,25 @@
 #include <Simulator.h>
 
 Globals globals;
-int main(int argc, char *argv[]){
-    
-    srand((int)globals.SEED);                                   // Initialise random seed   
-    DArgs::DArgs dargs(argc, argv);                             // Parse config file argument --cfg <file.json>
-    if (globals.parse_global_args(dargs)) return EXIT_FAILURE;  
-    
-    Simulator* sim = new Simulator();       // Initialise the simulator
-    globals.RUN = true;
-    while (globals.RUN){
+int main(int argc, char *argv[]) {
 
-        sim->eventHandler();                // Capture keypresses or mouse events             
-        sim->createOrDeleteRobots();        
-        sim->timestep();
-        sim->draw();
+  srand((int)globals.SEED); // Initialise random seed
+  DArgs::DArgs dargs(argc,
+                     argv); // Parse config file argument --cfg <file.json>
+  if (globals.parse_global_args(dargs))
+    return EXIT_FAILURE;
 
-    }
+  Simulator *sim = new Simulator(); // Initialise the simulator
+  globals.RUN = true;
+  while (globals.RUN) {
 
-    delete sim;
+    sim->eventHandler(); // Capture keypresses or mouse events
+    sim->createOrDeleteRobots();
+    sim->timestep();
+    sim->draw();
+  }
 
-    return 0;
-}    
+  delete sim;
+
+  return 0;
+}
