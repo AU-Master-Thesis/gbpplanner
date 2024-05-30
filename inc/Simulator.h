@@ -7,6 +7,8 @@
 #include <map>
 #include <memory>
 #include <algorithm>
+#include <array>
+#include <vector>
 
 #include <Utils.h>
 #include <gbp/GBPCore.h>
@@ -20,9 +22,43 @@
 #include <KDTreeMapOfVectorsAdaptor.h>
 #include <random>
 
+#include <json.hpp>
+
 class Robot;
 class Graphics;
 class TreeOfRobots;
+
+// struct TrackedData {
+    
+// };
+
+using nlohmann::json;
+
+
+using vec2 = std::array<double, 2>;
+using vec3 = std::array<double, 3>;
+
+struct TrackedData {
+   std::vector<std::array<double, 2>> positions;
+   std::vector<std::array<double, 2>> velocities;
+   double spawned_at;
+
+   TrackedData() = default;
+
+   TrackedData(std::array<double, 2> initial_position,
+               std::array<double, 2> initial_velocity, 
+               double spawned_at,
+               std::size_t capacity = 1024)
+       : spawned_at(spawned_at) {
+     positions.reserve(capacity);
+     velocities.reserve(capacity);
+     positions.push_back(initial_position);
+     velocities.push_back(initial_velocity);
+   };
+ };
+
+ // Define the to_json function for TrackedData
+ void to_json(json &j, const TrackedData &data);
 
 /************************************************************************************/
 // The main Simulator. This is where the magic happens.
@@ -58,6 +94,7 @@ public:
                                                     // a pair of factors is created (one belonging to each robot). This becomes a redundancy.
 
 
+    std::map<int, TrackedData> tracked_data_of_each_robot;
     /*******************************************************************************/
     // Create new robots if needed. Handles deletion of robots out of bounds. 
     // New formations must modify the vectors "robots to create" and optionally "robots_to_delete"

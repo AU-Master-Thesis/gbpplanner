@@ -9,6 +9,13 @@
 #include <Robot.h>
 #include <nanoflann.h>
 
+
+void to_json(json &j, const TrackedData &data) {
+   j = json{{"positions", data.positions},
+            {"velocities", data.velocities},
+            {"spawned_at", data.spawned_at}};
+ }
+
 /*******************************************************************************/
 // Raylib setup
 /*******************************************************************************/
@@ -43,7 +50,26 @@ Simulator::~Simulator(){
         delete graphics;
         CloseWindow();
     }
+
+// TODO: log metrics in a json structure
+// { "makespan": <float>,
+//  "robots": {"robot_id": {"positions": [], "velocities": []}, ...},
+// }
+    std::ofstream metrics_file;
+    metrics_file.open("metrics.json");
+    json json;
+    /*json["makespan"] = clock_;*/
+    json["clock-ticks"] = this->clock_;
+    json["robots"] = {};
+    for (auto [rid, tracked_data] : this->tracked_data_of_each_robot) {
+      // json["robots"][rid]["positions"] = tracked_data.positions;
+      json["robots"][rid] = tracked_data;
+      // json["robots"][rid]["velocities"] = tracked_data.velocities;
+    }
+    metrics_file << json;
+    metrics_file.close();
 };
+
 
 /*******************************************************************************/
 // Drawing graphics.
@@ -90,6 +116,15 @@ void Simulator::timestep(){
     for (auto [r_id, robot] : robots_) {
         robot->updateHorizon();
         robot->updateCurrent();
+
+         auto &tracked_data = this->tracked_data_of_each_robot[r_id];
+         std::array<double, 2> position = {robot->position_(0), robot->position_(1)};
+         const auto &last_position = tracked_data.positions.back();
+         const auto dt = globals.TIMESTEP;
+         std::array<double, 2> velocity = {(position[0] - last_position[0]) / dt,
+                                           (position[1] - last_position[1]) / dt};
+         tracked_data.positions.push_back(position);
+         tracked_data.velocities.push_back(velocity);
     }
 
     // Increase simulation clock by one timestep
@@ -286,6 +321,37 @@ void Simulator::createOrDeleteRobots(){
     for (auto robot : robots_to_create){
         robot_positions_[robot->rid_] = std::vector<double>{robot->waypoints_[0](0), robot->waypoints_[0](1)};
         robots_[robot->rid_] = robot;
+
+
+    std::array<double, 2> initial_position = {robot->waypoints_[0](0),
+                                              robot->waypoints_[0](1)};
+    // const auto &next_waypoint = robot->waypoints_[1];
+    // std::cout << "next_waypoint.size(): " << next_waypoint.size() << '\n';
+    const std::array<double, 2> next_waypoint = { 0., 0. };
+    
+    const std::array<double, 2> initial_direction = {
+        next_waypoint[0] - initial_position[0],
+        next_waypoint[1] - initial_position[1]
+    };
+
+    // std::cerr << "got here\n";
+    // std::exit(1);
+    
+    const double length =
+        std::sqrt(initial_direction[0] * initial_direction[0] +
+                  initial_direction[1] * initial_direction[1]);
+
+    const std::array<double, 2> normalized_direction = {
+        initial_direction[0] / length, initial_direction[1] / length};
+
+    std::array<double, 2> initial_velocity = {
+        normalized_direction[0] * globals.MAX_SPEED,
+        normalized_direction[1] * globals.MAX_SPEED};
+
+    const double started_at = this->clock_ * globals.TIMESTEP;
+    // this->tracked_data_of_each_robot[robot->rid_] =
+    this->tracked_data_of_each_robot.emplace(robot->rid_, TrackedData(initial_position, initial_velocity, started_at));
+        
     };
     for (auto robot : robots_to_delete){
         deleteRobot(robot);
