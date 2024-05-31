@@ -280,12 +280,13 @@ void Simulator::eventHandler()
 /*******************************************************************************/
 void Simulator::createOrDeleteRobots()
 {
-    if (!new_robots_needed_)
-        return;
+    if (!new_robots_needed_) return;
 
     std::vector<std::shared_ptr<Robot>> robots_to_create{};
     std::vector<std::shared_ptr<Robot>> robots_to_delete{};
     Eigen::VectorXd starting, turning, ending; // Waypoints : [x,y,xdot,ydot].
+    std::cout << "formation: " << globals.FORMATION << '\n';
+
     if (globals.FORMATION == "varying_network")
     {
         std::cout << "varying_network\n";

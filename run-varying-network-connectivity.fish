@@ -26,12 +26,12 @@ printf '%sinfo%s: starting experiment\n' $green $reset >&2
 set -l t_start (date "+%s")
 
 for seed in 0
-    set -l json (jaq ".SEED = $seed" > $config_file)
+    set -l json (jaq ".SEED = $seed" < $config_file)
     printf '%s\n' $json >$config_file
     printf '%sinfo%s: changed SEED to: %d\n' $green $reset $seed >&2
 
     for comms_radius in 20 40 60 80
-        set -l json (jaq ".COMMUNICATION_RADIUS = $comms_radius" > $config_file)
+        set -l json (jaq ".COMMUNICATION_RADIUS = $comms_radius" < $config_file)
         printf '%s\n' $json >$config_file
 
         printf '%sinfo%s: changed COMMUNICATION_RADIUS to: %d\n' $green $reset $comms_radius >&2
@@ -52,7 +52,7 @@ for seed in 0
             end
         end
 
-        ./cmake-build-release/gbpplanner --config $config_file
+        ./cmake-build-release/gbpplanner --cfg $config_file
         set -l exported_json metrics.json
         test -f $exported_json; or exit 1
         set -l dirname (path dirname "$output_file")
