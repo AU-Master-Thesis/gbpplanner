@@ -11,9 +11,12 @@
 
 void to_json(json &j, const TrackedData &data)
 {
-    j = json{{"positions", data.positions},
+    j = json {
+             {"positions", data.positions},
              {"velocities", data.velocities},
-             {"spawned_at", data.spawned_at}};
+             {"spawned_at", data.spawned_at},
+             {"finished_at", *data.finished_at}
+         };
 }
 
 /*******************************************************************************/
@@ -125,9 +128,9 @@ void Simulator::timestep()
         iterateGBP(1, EXTERNAL, robots_);
     }
 
+    std::size_t finished = 0;
     // Update the robot current and horizon states by one timestep
-    for (auto [r_id, robot] : robots_)
-    {
+    for (auto [r_id, robot] : robots_) {
         robot->updateHorizon();
         robot->updateCurrent();
 
@@ -139,6 +142,27 @@ void Simulator::timestep()
                                           (position[1] - last_position[1]) / dt};
         tracked_data.positions.push_back(position);
         tracked_data.velocities.push_back(velocity);
+
+        // if (robot->waypoints_.empty()) {
+        // if (robot->waypoints_.size() == 0  && this->clock_ > 200) {
+        auto distance = (robot->waypoints_.front()({0, 1}) - robot->position_({0, 1})).norm();
+        bool reached_final_waypoint = distance < robot->robot_radius_;
+        
+        if (reached_final_waypoint) {
+            if (!tracked_data.finished_at.has_value()) {
+                tracked_data.finished_at = this->clock_ * globals.TIMESTEP;
+            }
+            finished++;
+        }
+    }
+
+    // std::cout << "#robots: " << robots_.size() << " #finished: " << finished << '\n';
+    if (robots_.size() > 0 && finished == robots_.size()) {
+        // stop sim if all robots have finished.
+        // only makes sense in scenarios where all robots spawn at once.
+        globals.RUN = false;
+    } else {
+        // std::cout << "#robots: " << robots_.size() << " #finished: " << finished << '\n';
     }
 
     // Increase simulation clock by one timestep

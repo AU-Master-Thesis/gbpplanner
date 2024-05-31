@@ -46,6 +46,7 @@ public:
     Image* p_obstacleImage;                     // Pointer to image representing the obstacles in the environment
     float height_3D_ = 0.f;                     // Height out of plane (for 3d visualisation only)
     Eigen::VectorXd position_;                  // Position of the robot (equivalent to taking the [x,y] of the current state of the robot)
+    bool finished = false;
 
     /****************************************/
     //Functions

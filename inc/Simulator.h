@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <vector>
+#include <optional>
 
 #include <Utils.h>
 #include <gbp/GBPCore.h>
@@ -42,6 +43,7 @@ struct TrackedData {
    std::vector<std::array<double, 2>> positions;
    std::vector<std::array<double, 2>> velocities;
    double spawned_at;
+   std::optional<double> finished_at;
 
    TrackedData() = default;
 
@@ -49,11 +51,15 @@ struct TrackedData {
                std::array<double, 2> initial_velocity, 
                double spawned_at,
                std::size_t capacity = 1024)
-       : spawned_at(spawned_at) {
-     positions.reserve(capacity);
-     velocities.reserve(capacity);
-     positions.push_back(initial_position);
-     velocities.push_back(initial_velocity);
+       : spawned_at(spawned_at),
+           // finished_at(5.0),
+         finished_at(std::nullopt) 
+         {
+     this->positions.reserve(capacity);
+     this->velocities.reserve(capacity);
+     this->positions.push_back(initial_position);
+     this->velocities.push_back(initial_velocity);
+     // this->finished_at = std::nullopt;
    };
  };
 

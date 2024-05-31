@@ -141,8 +141,11 @@ void Robot::updateHorizon() {
   // waypoints. Could add other waypoint behaviours here (maybe they might move,
   // or change randomly).
   if (dist_horz_to_goal.norm() < robot_radius_) {
-    if (waypoints_.size() > 1)
+    if (waypoints_.size() > 1) {
       waypoints_.pop_front();
+    } else {
+      // this->finished = true;
+    }
   }
 }
 
