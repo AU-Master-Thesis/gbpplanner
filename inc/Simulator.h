@@ -29,9 +29,6 @@ class Robot;
 class Graphics;
 class TreeOfRobots;
 
-// struct TrackedData {
-    
-// };
 
 using nlohmann::json;
 
@@ -44,6 +41,7 @@ struct TrackedData {
    std::vector<std::array<double, 2>> velocities;
    double spawned_at;
    std::optional<double> finished_at;
+   std::vector<std::array<double, 2>> waypoints;
 
    TrackedData() = default;
 

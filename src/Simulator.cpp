@@ -14,8 +14,9 @@ void to_json(json &j, const TrackedData &data)
     j = json {
              {"positions", data.positions},
              {"velocities", data.velocities},
-             {"spawned_at", data.spawned_at},
-             {"finished_at", *data.finished_at}
+             {"started_at", data.spawned_at},
+             {"finished_at", *data.finished_at},
+             {"mission", json {{"started_at", data.spawned_at}, {"finished_at", *data.finished_at}, {"waypoints", data.waypoints}}},
          };
 }
 
@@ -73,7 +74,7 @@ Simulator::~Simulator()
     for (auto [rid, tracked_data] : this->tracked_data_of_each_robot)
     {
         // json["robots"][rid]["positions"] = tracked_data.positions;
-        json["robots"][rid] = tracked_data;
+        json["robots"][std::to_string(rid)] = tracked_data;
         // json["robots"][rid]["velocities"] = tracked_data.velocities;
     }
     metrics_file << json;
@@ -428,6 +429,9 @@ void Simulator::createOrDeleteRobots()
     // Create and/or delete the robots as necessary.
     for (auto robot : robots_to_create)
     {
+        const auto& wp1 = robot->waypoints_[0];
+        // const auto& wp2 = robot->waypoints_[1];
+        
         robot_positions_[robot->rid_] = std::vector<double>{robot->waypoints_[0](0), robot->waypoints_[0](1)};
         robots_[robot->rid_] = robot;
 
@@ -435,29 +439,40 @@ void Simulator::createOrDeleteRobots()
                                                   robot->waypoints_[0](1)};
         // const auto &next_waypoint = robot->waypoints_[1];
         // std::cout << "next_waypoint.size(): " << next_waypoint.size() << '\n';
-        const std::array<double, 2> next_waypoint = {0., 0.};
+        const std::array<double, 2> next_waypoint = {-initial_position[0], -initial_position[1]};
 
         const std::array<double, 2> initial_direction = {
             next_waypoint[0] - initial_position[0],
-            next_waypoint[1] - initial_position[1]};
-
-        // std::cerr << "got here\n";
-        // std::exit(1);
+            next_waypoint[1] - initial_position[1]
+        };
 
         const double length =
             std::sqrt(initial_direction[0] * initial_direction[0] +
                       initial_direction[1] * initial_direction[1]);
 
         const std::array<double, 2> normalized_direction = {
-            initial_direction[0] / length, initial_direction[1] / length};
+            initial_direction[0] / length,
+            initial_direction[1] / length
+        };
 
-        std::array<double, 2> initial_velocity = {
+        const std::array<double, 2> initial_velocity = {
             normalized_direction[0] * globals.MAX_SPEED,
-            normalized_direction[1] * globals.MAX_SPEED};
+            normalized_direction[1] * globals.MAX_SPEED
+        };
 
         const double started_at = this->clock_ * globals.TIMESTEP;
         // this->tracked_data_of_each_robot[robot->rid_] =
         this->tracked_data_of_each_robot.emplace(robot->rid_, TrackedData(initial_position, initial_velocity, started_at));
+        std::vector<std::array<double, 2>> waypoints = {
+            {robot->position_(0), robot->position_(1)}
+        };
+        for (auto& wp : robot->waypoints_) {
+            waypoints.push_back({wp(0), wp(1)});
+        }
+
+        assert(waypoints.size() >= 2);
+        
+        this->tracked_data_of_each_robot[robot->rid_].waypoints = waypoints;
     };
     for (auto robot : robots_to_delete)
     {
