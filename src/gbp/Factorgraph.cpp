@@ -33,17 +33,24 @@ void FactorGraph::factorIteration(MsgPassingMode msg_passing_mode)
         std::advance(f_it, f_idx);
         auto [f_key, fac] = *f_it;
 
+        // if (fac->factor_type_ == INTERROBOT_FACTOR  && !this->interrobot_comms_active_) {
+        // if (fac->factor_type_ == INTERROBOT_FACTOR) {
+            // std::cout << "skipping\n";
+        //     continue;
+        // }
+
         for (auto var : fac->variables_)
         {
             // Check if the factor need to be skipped [see note in description]
-            // if (((msg_passing_mode==INTERNAL) == (var->key_.robot_id_!=robot_id_) ||
-            //         (!interrobot_comms_active_ && (var->key_.robot_id_!=robot_id_) && (msg_passing_mode==EXTERNAL)))) continue;
-            if ((msg_passing_mode == INTERNAL && var->key_.robot_id_ != robot_id_) ||
-                (msg_passing_mode == EXTERNAL && var->key_.robot_id_ == robot_id_))
-                continue;
+            if (((msg_passing_mode==INTERNAL) == (var->key_.robot_id_!=robot_id_) ||
+                    (!interrobot_comms_active_ && (var->key_.robot_id_!=robot_id_) && (msg_passing_mode==EXTERNAL)))) { continue; }
+            // if ((msg_passing_mode == INTERNAL && var->key_.robot_id_ != robot_id_) ||
+            //     (msg_passing_mode == EXTERNAL && var->key_.robot_id_ == robot_id_))
+            //     continue;
             // Read message from each connected variable
             fac->inbox_[var->key_] = var->outbox_.at(f_key);
         }
+
         // Calculate factor potential and create outgoing messages
         fac->update_factor();
     };
@@ -74,11 +81,18 @@ void FactorGraph::variableIteration(MsgPassingMode msg_passing_mode)
         for (auto [f_key, fac] : var->factors_)
         {
             // * Check if the variable need to be skipped [see note in description]
-            // if (((msg_passing_mode == INTERNAL) == (var->key_.robot_id_ != robot_id_) ||
-            //      (!interrobot_comms_active_ && (var->key_.robot_id_ != robot_id_) && (msg_passing_mode == EXTERNAL))))
-            if ((msg_passing_mode == INTERNAL && var->key_.robot_id_ != robot_id_) ||
-                (msg_passing_mode == EXTERNAL && var->key_.robot_id_ == robot_id_))
+            if (((msg_passing_mode == INTERNAL) == (var->key_.robot_id_ != robot_id_) ||
+                 (!interrobot_comms_active_ && (var->key_.robot_id_ != robot_id_) && (msg_passing_mode == EXTERNAL)))) {
+            // if ((msg_passing_mode == INTERNAL && var->key_.robot_id_ != robot_id_) ||
+            //     (msg_passing_mode == EXTERNAL && var->key_.robot_id_ == robot_id_))
                 continue;
+            }
+
+            // if (fac->factor_type_ == INTERROBOT_FACTOR  && !this->interrobot_comms_active_) {
+            // if (fac->factor_type_ == INTERROBOT_FACTOR) {
+                // std::cout << "skipping\n";
+            //     continue;
+            // }
 
             // Read message from each connected factor
             var->inbox_[f_key] = fac->outbox_.at(v_key);
@@ -87,5 +101,4 @@ void FactorGraph::variableIteration(MsgPassingMode msg_passing_mode)
         // Update variable belief and create outgoing messages
         var->update_belief();
     };
-    ;
 }

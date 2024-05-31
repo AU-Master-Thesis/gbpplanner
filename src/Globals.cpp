@@ -75,10 +75,10 @@ void Globals::post_parsing() {
   // Cap max speed, since it should be <= ROBOT_RADIUS/2.f / TIMESTEP:
   // In one timestep a robot should not move more than half of its radius
   // (since we plan for discrete timesteps)
-  if (MAX_SPEED > ROBOT_RADIUS / 2.f / TIMESTEP) {
-    MAX_SPEED = ROBOT_RADIUS / 2.f / TIMESTEP;
-    print("Capping MAX_SPEED parameter at ", MAX_SPEED);
-  }
+  /*if (MAX_SPEED > ROBOT_RADIUS / 2.f / TIMESTEP) {*/
+  /*  MAX_SPEED = ROBOT_RADIUS / 2.f / TIMESTEP;*/
+  /*  print("Capping MAX_SPEED parameter at ", MAX_SPEED);*/
+  /*}*/
   T0 = ROBOT_RADIUS / 2.f /
        MAX_SPEED; // Time between current state and next state of planned path
 }
