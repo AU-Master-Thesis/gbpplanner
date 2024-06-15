@@ -37,7 +37,7 @@ public:
     Simulator* sim_;                            // Pointer to the simulator
     int rid_ = 0;                               // Robot id
     std::deque<Eigen::VectorXd> waypoints_{};   // Dequeue of waypoints (whenever the robot reaches a point, it is popped off the front of the dequeue)
-    float robot_radius_ = 1.;                   // Robot radius
+    float robot_radius_;                   // Robot radius
     Color color_ = DARKGREEN;                   // Colour of robot
 
     int num_variables_;                         // Number of variables in the planned path (assumed to be the same for all robots)

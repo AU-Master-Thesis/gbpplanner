@@ -267,7 +267,7 @@ InterrobotFactor::InterrobotFactor(
   factor_type_ = INTERROBOT_FACTOR;
   float eps = 0.2 * robot_radius;
   this->safety_distance_ = 2 * robot_radius + eps;
-  std::cout << "this->safety_distance_ = " << this->safety_distance_ << '\n';
+  // std::cout << "this->safety_distance_ = " << this->safety_distance_ << '\n';
   this->delta_jac = 1e-2;
 };
 

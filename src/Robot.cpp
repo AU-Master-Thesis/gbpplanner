@@ -141,11 +141,20 @@ void Robot::updateHorizon() {
   // waypoints. Could add other waypoint behaviours here (maybe they might move,
   // or change randomly).
   if (dist_horz_to_goal.norm() < robot_radius_) {
-    if (waypoints_.size() > 1) {
-      waypoints_.pop_front();
+    if (globals.FORMATION == "custom") {
+      waypoints_.front()(0) =
+          sim_->random_int(-globals.WORLD_SZ / 2, globals.WORLD_SZ / 2);
+      waypoints_.front()(1) =
+          sim_->random_int(-globals.WORLD_SZ / 2, globals.WORLD_SZ / 2);
     } else {
-      // this->finished = true;
+      if (waypoints_.size() > 1)
+        waypoints_.pop_front();
     }
+    // if (waypoints_.size() > 1) {
+    //   waypoints_.pop_front();
+    // } else {
+    //   // this->finished = true;
+    // }
   }
 }
 

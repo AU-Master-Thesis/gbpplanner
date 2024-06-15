@@ -42,16 +42,19 @@ struct TrackedData {
    double spawned_at;
    std::optional<double> finished_at;
    std::vector<std::array<double, 2>> waypoints;
+   double radius;
 
    TrackedData() = default;
 
    TrackedData(std::array<double, 2> initial_position,
                std::array<double, 2> initial_velocity, 
                double spawned_at,
+               double radius,
                std::size_t capacity = 1024)
        : spawned_at(spawned_at),
            // finished_at(5.0),
-         finished_at(std::nullopt) 
+         finished_at(std::nullopt),
+         radius(radius)
          {
      this->positions.reserve(capacity);
      this->velocities.reserve(capacity);
